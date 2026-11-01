@@ -1,7 +1,7 @@
 // 離線快取：更新題庫或程式後，把 VERSION 改一下，iPad 下次連網開啟時就會換成新版
 // 同一個網域上可能還有其他 App，快取只清自己（PREFIX 開頭）的舊版本
 const PREFIX = 'engq-';
-const VERSION = PREFIX + 'v1';
+const VERSION = PREFIX + 'v3';
 const FILES = ['./', 'index.html', 'app.js', 'chapters.js', 'questions.js', 'write.js', 'hero.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -17,6 +17,7 @@ self.addEventListener('activate', e => {
 // 先用網路拿最新版，沒網路時才用快取
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  if (new URL(e.request.url).origin !== self.location.origin) return; // 發音音檔等外部網址不經過快取（Safari 播放聲音才不會出問題）
   e.respondWith(
     fetch(e.request)
       .then(res => {

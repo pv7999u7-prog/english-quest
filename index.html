@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>英文挑戰王</title>
+<meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -232,6 +233,11 @@ input[type=text], input[type=tel] { font: inherit; padding: 10px 12px; border-ra
 .listen-box .say-btn { font-size: 22px; padding: 14px 22px; }
 .sched-row { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; padding: 8px 0; border-top: 1px dashed var(--line, #ddd); margin-top: 8px; }
 .question { font-family: inherit; white-space: pre-line; }
+.type-box { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+.type-in { font-size: 26px; padding: 12px 16px; border-radius: 14px; border: 3px solid var(--brand); width: min(420px, 100%); font-family: inherit; letter-spacing: 1px; }
+.type-in.right { border-color: var(--ok); background: var(--ok-soft); } .type-in.wrong { border-color: var(--bad); }
+.type-box .big-btn { width: auto; padding: 12px 22px; }
+.hint-letters { font-size: 22px; letter-spacing: 2px; color: var(--brand-dark); }
 .wf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .wf-card { margin: 0; }
 .wf-word { font-size: 30px; font-weight: 800; color: var(--brand-dark); cursor: pointer; letter-spacing: .5px; }

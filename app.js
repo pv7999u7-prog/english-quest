@@ -234,7 +234,7 @@ function pickWeighted(pool, n, exclude = [], lvl = 1) {
   const sorted = pool.filter(q => !exclude.includes(q.id)).map(q => {
     const r = S.q[q.id];
     const qlv = q.lv || 1;
-    const adj = qlv > lvl ? 3 : lvl >= 2 && qlv === 2 ? -0.4 : 0; // 進階題：基礎時幾乎不出、進階以上優先
+    const adj = qlv > lvl ? 3 : qlv >= 2 && qlv === lvl ? -0.4 : qlv >= 2 ? -0.2 : 0; // 進階題：等級不到幾乎不出；到了那一級優先出
     if (!r || !r.n) return { q, score: Math.random() * 0.3 + adj };
     const ago = daysSince(r.last);
     const recent = ago <= 1 ? 2 : ago <= 3 ? 1.2 : ago <= 7 ? 0.6 : 0;
@@ -472,7 +472,8 @@ function startBookAll() {
 function renderQ() {
   const q = sess.qs[sess.i];
   sess.answered = false;
-  sess.optOrder = q.t === 'tf' ? [0, 1] : q.o ? shuffle(q.o.map((_, i) => i)) : []; // 是非題固定「對」在前
+  sess.opts = q.extra ? [...q.o, ...q.extra] : q.o; // 拼字題多放幾個干擾字母
+  sess.optOrder = q.t === 'tf' ? [0, 1] : sess.opts ? shuffle(sess.opts.map((_, i) => i)) : []; // 是非題固定「對」在前
   sess.picked = [];
   const head = `
     <div class="qhead">
@@ -481,13 +482,15 @@ function renderQ() {
       <div class="combo">${sess.combo >= 2 ? `🔥×${sess.combo}` : `${sess.i + 1}/${sess.qs.length}`}</div>
     </div>
     <div class="row wrap">${chipOf(q)}${q.yWrong ? '<span class="chip" style="background:#e8590c">🔁 昨天錯的</span>' : ''}
-      ${S.q[q.id]?.book ? '<span class="chip" style="background:var(--bad)">錯題複習</span>' : ''}${q.lv === 2 || q.hard ? '<span class="chip" style="background:#8a5cf6">⭐ 進階</span>' : ''}</div>
+      ${S.q[q.id]?.book ? '<span class="chip" style="background:var(--bad)">錯題複習</span>' : ''}${q.lv === 3 ? '<span class="chip" style="background:#d6336c">🔥 挑戰</span>' : q.lv === 2 || q.hard ? '<span class="chip" style="background:#8a5cf6">⭐ 進階</span>' : ''}</div>
     <div class="question">${q.t === 'write' ? writeQuestionHtml(q) : esc(q.q)}</div>`;
   if (q.t === 'write') {
     app.innerHTML = head + writeBodyHtml(q);
     writeInit(q);
+  } else if (q.t === 'type') {
+    app.innerHTML = head + listenHtml(q) + typeBodyHtml(q);
   } else if (q.t === 'order') {
-    app.innerHTML = head + `${listenHtml(q)}<div class="small muted">${q.join === '' ? '依序點字母拼出單字' : '依序點單字排出句子'}，點錯可以再點一次取消。</div><div id="qbody"></div>`;
+    app.innerHTML = head + `${listenHtml(q)}<div class="small muted">${q.join === '' ? '依序點字母拼出單字（有些字母是多出來的，不用全部用完）' : '依序點單字排出句子'}，點錯可以再點一次取消。</div><div id="qbody"></div>`;
     renderOrder();
   } else {
     app.innerHTML = head + `${listenHtml(q)}
@@ -520,25 +523,25 @@ function renderOrder() {
     <div class="slots">${Array.from({ length: n }, (_, k) => {
       const oi = sess.picked[k];
       return `<button class="slot ${oi !== undefined ? 'filled' : ''}" ${oi !== undefined && !sess.answered ? `onclick="unpick(${k})"` : 'disabled'} data-k="${k}">
-        <span class="n">${k + 1}</span>${oi !== undefined ? esc(q.o[oi]) : ''}</button>`;
+        <span class="n">${k + 1}</span>${oi !== undefined ? esc(sess.opts[oi]) : ''}</button>`;
     }).join('')}</div>
     <div class="pool">${sess.optOrder.filter(oi => !sess.picked.includes(oi)).map(oi =>
-      `<button class="opt" onclick="pick(${oi})" ${sess.answered ? 'disabled' : ''}>${esc(q.o[oi])}</button>`).join('')}</div>
+      `<button class="opt" onclick="pick(${oi})" ${sess.answered || sess.picked.length >= n ? 'disabled' : ''}>${esc(sess.opts[oi])}</button>`).join('')}</div>
     ${!sess.answered ? `<div style="margin-top:16px"><button class="big-btn" onclick="checkOrder()" ${sess.picked.length === n ? '' : 'disabled'}>確認順序</button></div>` : ''}
     <div id="fb"></div>`;
 }
-function pick(oi) { if (!sess.answered) { sess.picked.push(oi); renderOrder(); } }
+function pick(oi) { if (!sess.answered && sess.picked.length < sess.qs[sess.i].o.length) { sess.picked.push(oi); renderOrder(); } }
 function unpick(k) { if (!sess.answered) { sess.picked.splice(k, 1); renderOrder(); } }
 function checkOrder() {
   const q = sess.qs[sess.i];
   sess.answered = true;
-  const ok = sess.picked.every((oi, k) => q.o[oi] === q.o[k]);
+  const ok = sess.picked.every((oi, k) => sess.opts[oi] === q.o[k]);
   renderOrder();
   document.querySelectorAll('.slot').forEach(el => {
     const k = +el.dataset.k;
-    el.classList.add(q.o[sess.picked[k]] === q.o[k] ? 'right' : 'wrong');
+    el.classList.add(sess.opts[sess.picked[k]] === q.o[k] ? 'right' : 'wrong');
   });
-  afterAnswer(q, ok, ok ? '' : `正確答案：${q.o.join(q.join ?? ' ')}`);
+  afterAnswer(q, ok, ok ? '' : `正確答案：${q.full || q.o.join(q.join ?? ' ')}`);
 }
 
 function afterAnswer(q, ok, correctLine) {
@@ -1238,14 +1241,27 @@ function pickVoice() {
   enVoice = vs.find(v => /en[-_]US/i.test(v.lang) && /Samantha|Google|Aaron|Nicky/i.test(v.name)) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
 }
 if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-function speak(text, slow) {
-  if (!window.speechSynthesis) { toast('這台裝置不支援發音'); return; }
-  speechSynthesis.cancel();
+// 優先播放線上發音音檔（<audio> 走媒體聲道，iPad 靜音開關不會擋）；播不出來才改用內建語音
+const ttsAudio = new Audio();
+ttsAudio.preload = 'auto';
+const ttsUrl = t => 'https://translate.google.com/translate_tts?ie=UTF-8&tl=en-US&client=tw-ob&q=' + encodeURIComponent(t.slice(0, 190));
+function speakSynth(text, slow) {
+  if (!window.speechSynthesis) { toast('這台裝置播放不了發音，請檢查網路或音量'); return; }
+  if (speechSynthesis.speaking) speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US';
   if (enVoice) u.voice = enVoice;
   u.rate = slow ? 0.6 : 0.85;
   speechSynthesis.speak(u);
+}
+function speak(text, slow) {
+  ttsAudio.onerror = () => speakSynth(text, slow);
+  ttsAudio.src = ttsUrl(text);
+  ttsAudio.defaultPlaybackRate = ttsAudio.playbackRate = slow ? 0.65 : 1;
+  ttsAudio.onloadedmetadata = () => { ttsAudio.playbackRate = slow ? 0.65 : 1; };
+  const p = ttsAudio.play();
+  // 沒按按鈕就自動播放被擋（NotAllowedError）時不吵孩子，按 🔊 就能聽
+  if (p) p.catch(err => { if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') speakSynth(text, slow); });
 }
 const sayBtn = (text, label, slow) => `<button class="say-btn" onclick='speak(${JSON.stringify(text).replace(/'/g, '&#39;')}, ${slow ? 1 : 0})'>${label}</button>`;
 // 答完題：可以點來聽單字、例句、正確句子
@@ -1259,7 +1275,7 @@ function sayHtml(q) {
 // 聽力題：題目上方的大喇叭
 function listenHtml(q) {
   if (!q.listen) return '';
-  setTimeout(() => speak(q.listen), 350);
+  speak(q.listen); // 要在按「開始／下一題」的同一個動作裡播放，iPad 才允許自動出聲
   return `<div class="listen-box">${sayBtn(q.listen, '🔊 再聽一次')}${sayBtn(q.listen, '🐢 慢速', 1)}</div>`;
 }
 
@@ -1311,7 +1327,40 @@ function startWordFix() {
   // 每個字考一題：優先拼字、聽力，再來看中文選英文
   const qs = ws.map(w => {
     const qs = wordQs(w);
-    return qs.find(q => q.id.endsWith('-4')) || qs.find(q => q.id.endsWith('-3')) || qs.find(q => q.id.endsWith('-2')) || qs[0];
+    return qs.find(q => q.id.endsWith('-8')) || qs.find(q => q.id.endsWith('-4')) || qs.find(q => q.id.endsWith('-2')) || qs[0]; // 剛背完：直接默寫
   });
   startSession('wordfix', shuffle(qs), '🧱 錯字特訓', 'soc');
+}
+
+// ───────── 英文版：打字題（★★★ 長單字默寫、聽寫）─────────
+const normAns = t => t.toLowerCase().replace(/[’]/g, "'").replace(/[.?!,]+$/g, '').replace(/\s+/g, ' ').trim();
+// 提示：第一個字母＋其他字母變底線（空白、標點保留）
+const hintOf = w => [...w].map((c, i) => (i === 0 || !/[a-z]/i.test(c) ? c : '_')).join(' ');
+function typeBodyHtml(q) {
+  sess.typeTries = 0;
+  return `<div class="type-box">
+      <input id="typein" class="type-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="在這裡打英文" onkeydown="if (event.key === 'Enter') checkType()">
+      <button class="big-btn" onclick="checkType()">✔ 確認</button></div>
+    <div id="typemsg" class="small center" style="min-height:24px;margin-top:8px"></div>
+    <div id="fb"></div>`;
+}
+function checkType() {
+  if (!sess || sess.answered) return;
+  const q = sess.qs[sess.i];
+  const inp = document.getElementById('typein');
+  if (!inp.value.trim()) { toast('先打字喔'); return; }
+  const ok = normAns(inp.value) === normAns(q.w);
+  if (!ok && !sess.typeTries) { // 第一次錯：給提示，再一次機會（像 Quizlet）
+    sess.typeTries = 1;
+    document.getElementById('typemsg').innerHTML = `🤔 不太對，再試一次！提示：<b class="hint-letters">${esc(hintOf(q.w))}</b>`;
+    app.querySelector('.question')?.classList.add('shake');
+    setTimeout(() => app.querySelector('.question')?.classList.remove('shake'), 500);
+    inp.select();
+    return;
+  }
+  sess.answered = true;
+  inp.disabled = true;
+  inp.classList.add(ok ? 'right' : 'wrong');
+  document.getElementById('typemsg').innerHTML = '';
+  afterAnswer(q, ok, ok ? '' : `正確答案：${q.w}（你打的是 ${inp.value.trim()}）`);
 }

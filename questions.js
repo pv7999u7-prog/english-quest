@@ -340,37 +340,58 @@ BANK.push(
 );
 
 // ═════════ 單字題（由 VOCAB_UNITS 自動產生）═════════
-// 每個單字最多 5 題：看英文選中文、看中文選英文、聽發音選單字、拼字、例句填空
+// 分三級（孩子答對率高時 App 會自動提高難度，見 app.js 的 diffLevel）：
+//   ★ 基礎：看英文選中文、看中文選英文、聽發音選單字、字母方塊拼字（干擾字母挑「長得像、容易搞混」的）
+//   ★★ 進階（lv 2）：挖空填字母、聽發音拼字、例句填空
+//   ★★★ 挑戰（lv 3）：看中文把整個字寫出來（6 個字母以內用手寫、長的用打字）、聽寫（聽發音打出來）
 (function makeVocab() {
   const all = VOCAB_UNITS.flatMap((u, i) => u.words.map(w => ({ ch: i + 1, w: w[0], zh: w[1], ex: w[2], exZh: w[3] })));
   const slug = w => w.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-  const rnd = a => a[Math.floor(Math.random() * a.length)];
+  const mix = a => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
   // 干擾選項：先找同一關的字，不夠再從全部挑；選項不重複
   function others(x, key, n, filter = () => true) {
-    const same = all.filter(y => y.ch === x.ch && y !== x && filter(y));
-    const pool = [...same.sort(() => Math.random() - 0.5), ...all.filter(y => y.ch !== x.ch && filter(y)).sort(() => Math.random() - 0.5)];
+    const pool = [...mix(all.filter(y => y.ch === x.ch && y !== x && filter(y))), ...mix(all.filter(y => y.ch !== x.ch && filter(y)))];
     const out = [];
     for (const y of pool) { if (out.length >= n) break; if (y[key] !== x[key] && !out.includes(y[key])) out.push(y[key]); }
     return out;
   }
   const looksLike = x => y => y.w[0].toLowerCase() === x.w[0].toLowerCase() || Math.abs(y.w.length - x.w.length) <= 1;
+  // 容易搞混的字母（b/d/p/q、m/n、i/e/l、c/k/s…）
+  const CONF = { a: 'eou', b: 'dpq', c: 'ksz', d: 'bpq', e: 'aio', f: 'tv', g: 'jqy', h: 'nk', i: 'ejly', j: 'gi', k: 'ch', l: 'it', m: 'nw', n: 'mhu', o: 'aeu', p: 'bdq', q: 'gp', r: 'nl', s: 'cz', t: 'fl', u: 'vnw', v: 'uw', w: 'vm', x: 'zk', y: 'ig', z: 'sx' };
+  // 干擾字母：一個「多出來的重複字母」（考雙寫）＋幾個易混字母
+  function decoys(letters, n) {
+    const low = letters.map(c => c.toLowerCase());
+    const out = [mix(low)[0]];
+    const cand = mix([...new Set(low.flatMap(c => [...(CONF[c] || '')]))].filter(c => !low.includes(c)));
+    for (const c of cand) { if (out.length >= n) break; out.push(c); }
+    while (out.length < n) out.push(mix([...'aeioustnrl'])[0]);
+    return out;
+  }
   for (const x of all) {
     const id = `v-${slug(x.w)}`;
     const base = { s: 'voc', ch: x.ch, word: x.w, e: `${x.w} ＝ ${x.zh}` };
     const ex = x.ex ? { say: x.ex, sayZh: x.exZh } : {};
+    const letters = /^[a-z]{3,10}$/i.test(x.w); // 純字母、3～10 個字母的字才出拼字題
+    // ── ★ 基礎 ──
     BANK.push({ ...base, ...ex, id: `${id}-1`, t: 'mc', q: `「${x.w}」是什麼意思？`, o: [x.zh, ...others(x, 'zh', 3)], a: 0 });
     BANK.push({ ...base, ...ex, id: `${id}-2`, t: 'mc', q: `「${x.zh}」的英文是？`, o: [x.w, ...others(x, 'w', 3)], a: 0 });
     BANK.push({ ...base, ...ex, id: `${id}-3`, t: 'mc', q: '🎧 聽發音，選出正確的單字', listen: x.w, o: [x.w, ...others(x, 'w', 3, looksLike(x))], a: 0 });
-    if (/^[a-z]{3,10}$/i.test(x.w)) {
-      BANK.push({ ...base, ...ex, id: `${id}-4`, t: 'order', join: '', q: `🔤 拼出「${x.zh}」的英文`, o: [...x.w], lv: x.w.length > 6 ? 2 : 1 });
-    }
-    // 例句填空：例句裡要真的出現這個字
-    if (x.ex) {
+    if (letters) BANK.push({ ...base, ...ex, id: `${id}-4`, t: 'order', join: '', q: `🔤 拼出「${x.zh}」的英文`, o: [...x.w], extra: decoys([...x.w], x.w.length > 6 ? 4 : 3) });
+    // ── ★★ 進階 ──
+    if (x.ex) { // 例句填空：例句裡要真的出現這個字
       const re = new RegExp(`\\b${x.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      if (re.test(x.ex)) {
-        BANK.push({ ...base, ...ex, id: `${id}-5`, t: 'mc', q: `📝 填入正確的單字：\n${x.ex.replace(re, '_____')}\n（${x.exZh}）`, o: [x.w, ...others(x, 'w', 3)], a: 0, lv: 2 });
-      }
+      if (re.test(x.ex)) BANK.push({ ...base, ...ex, id: `${id}-5`, t: 'mc', q: `📝 填入正確的單字：\n${x.ex.replace(re, '_____')}\n（${x.exZh}）`, o: [x.w, ...others(x, 'w', 3)], a: 0, lv: 2 });
     }
+    if (letters && x.w.length >= 4) { // 挖空填字母：第一個字母保留，挖掉約 4 成
+      const idx = mix([...x.w].map((_, i) => i).slice(1)).slice(0, Math.max(2, Math.round(x.w.length * 0.4))).sort((a, b) => a - b);
+      const shown = [...x.w].map((c, i) => (idx.includes(i) ? '＿' : c)).join(' ');
+      const miss = idx.map(i => x.w[i]);
+      BANK.push({ ...base, ...ex, id: `${id}-6`, t: 'order', join: '', full: x.w, q: `🧩 補上缺少的字母：「${x.zh}」\n${shown}`, o: miss, extra: decoys(miss, 2), lv: 2 });
+    }
+    if (letters) BANK.push({ ...base, ...ex, id: `${id}-7`, t: 'order', join: '', q: `🎧 聽發音，拼出這個單字`, listen: x.w, o: [...x.w], extra: decoys([...x.w], 3), lv: 2 });
+    // ── ★★★ 挑戰 ──
+    if (letters && x.w.length <= 6) BANK.push({ ...base, ...ex, id: `${id}-8`, t: 'write', en: true, q: `✍️ 用手寫寫出「${x.zh}」的英文`, w: x.w, lv: 3 });
+    else BANK.push({ ...base, ...ex, id: `${id}-8`, t: 'type', q: `⌨️ 打出「${x.zh}」的英文`, w: x.w, lv: 3 });
+    BANK.push({ ...base, ...ex, id: `${id}-9`, t: 'type', q: '🎧 聽寫：聽發音，打出這個英文', listen: x.w, w: x.w, lv: 3 });
   }
-  void rnd;
 })();

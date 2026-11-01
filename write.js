@@ -13,12 +13,26 @@ const HW_URL = 'https://inputtools.google.com/request?ime=handwriting&app=mobile
 let hw = null; // 目前這題的手寫狀態
 
 function writeQuestionHtml(q) {
+  if (q.en) return esc(q.q); // 英文默寫：題目直接顯示
   const parts = q.q.split(/（([^）]*)）/);
   const body = parts.map((t, i) => i % 2 ? `<span class="zy-blank">${esc(t)}</span>` : esc(t)).join('');
   return `<div class="small muted" style="font-weight:700">✍️ 看注音，寫出國字</div>${body}`;
 }
 
+// 英文默寫：一整個字寫在一條英文四線格上
+const hwCells = q => (q.en ? [q.w] : [...q.w]);
 function writeBodyHtml(q) {
+  if (q.en) {
+    const w = Math.floor(Math.min(Math.min(innerWidth, 760) - 48, 120 + q.w.length * 62));
+    return `
+    <div class="hw-row"><div class="hw-cell">
+      <canvas class="hw-pad hw-en" id="hw0" style="width:${w}px;height:150px"></canvas>
+      <button class="btn-sm hw-clear" onclick="writeClear(0)">↺ 擦掉重寫</button>
+    </div></div>
+    <div id="hwmsg" class="small center" style="min-height:24px;margin-top:6px"></div>
+    <div id="hwbtns" style="margin-top:8px"><button class="big-btn" onclick="writeSubmit()">✔ 寫好了</button></div>
+    <div id="fb"></div>`;
+  }
   const n = [...q.w].length;
   const px = Math.floor(Math.min(240, (Math.min(innerWidth, 760) - 64 - (n - 1) * 12) / n));
   return `
@@ -34,16 +48,16 @@ function writeBodyHtml(q) {
 
 function writeInit(q) {
   hw = { q, tries: 0, boxes: [], busy: false };
-  [...q.w].forEach((_, k) => {
+  hwCells(q).forEach((_, k) => {
     const cv = document.getElementById('hw' + k);
-    const size = cv.clientWidth, dpr = window.devicePixelRatio || 1;
-    cv.width = size * dpr; cv.height = size * dpr;
+    const size = cv.clientWidth, hgt = cv.clientHeight, dpr = window.devicePixelRatio || 1;
+    cv.width = size * dpr; cv.height = hgt * dpr;
     const ctx = cv.getContext('2d');
     ctx.scale(dpr, dpr);
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.lineWidth = Math.max(4, size / 26);
+    ctx.lineWidth = q.en ? 4 : Math.max(4, size / 26);
     ctx.strokeStyle = '#1d1b19';
-    const box = { cv, ctx, size, strokes: [], cur: null };
+    const box = { cv, ctx, size, hgt, strokes: [], cur: null };
     hw.boxes.push(box);
     const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
     cv.addEventListener('pointerdown', e => {
@@ -76,13 +90,13 @@ function writeClear(k) {
   if (!hw || sess?.answered || hw.busy) return;
   const b = hw.boxes[k];
   b.strokes = []; b.cur = null;
-  b.ctx.clearRect(0, 0, b.size, b.size);
+  b.ctx.clearRect(0, 0, b.size, b.hgt);
 }
 
 function writeMsg(html) { const el = document.getElementById('hwmsg'); if (el) el.innerHTML = html; }
 
 // 送一格的筆跡去辨識，回傳候選字陣列；失敗回傳 null
-async function writeRecognize(b) {
+async function writeRecognize(b, lang = 'zh_TW') {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), HW_TIMEOUT);
   try {
@@ -91,7 +105,7 @@ async function writeRecognize(b) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         options: 'enable_pre_space',
-        requests: [{ writing_guide: { writing_area_width: b.size, writing_area_height: b.size }, ink: b.strokes.map(([xs, ys, ts]) => [xs.map(Math.round), ys.map(Math.round), ts.map(t => t - b.strokes[0][2][0])]), language: 'zh_TW' }],
+        requests: [{ writing_guide: { writing_area_width: b.size, writing_area_height: b.hgt }, ink: b.strokes.map(([xs, ys, ts]) => [xs.map(Math.round), ys.map(Math.round), ts.map(t => t - b.strokes[0][2][0])]), language: lang }],
       }),
     });
     const j = await res.json();
@@ -106,20 +120,21 @@ async function writeRecognize(b) {
 async function writeSubmit() {
   if (!hw || sess?.answered || hw.busy) return;
   if (hw.boxes.some(b => !b.strokes.length)) { toast('每一格都要寫喔'); return; }
-  const chars = [...hw.q.w];
+  const chars = hwCells(hw.q);
   if (S.hwMode === 'self' || !navigator.onLine) { writeSelfCheck(); return; }
   hw.busy = true;
   writeMsg('🔍 正在看你寫的字…');
-  const results = await Promise.all(hw.boxes.map(writeRecognize));
+  const results = await Promise.all(hw.boxes.map(b => writeRecognize(b, hw.q.en ? 'en' : 'zh_TW')));
   hw.busy = false;
   if (!sess || sess.answered || hw.q !== sess.qs[sess.i]) return;
   if (results.some(r => r === null)) { writeMsg('⚠️ 連不上手寫辨識，改成自己對答案'); writeSelfCheck(); return; }
-  const okEach = results.map((r, k) => r.slice(0, HW_TOP).includes(chars[k]));
+  const same = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+  const okEach = results.map((r, k) => hw.q.en ? r.slice(0, HW_TOP).some(c => same(c, chars[k])) : r.slice(0, HW_TOP).includes(chars[k]));
   if (okEach.every(Boolean)) { writeMsg(''); writeFinish(true); return; }
   hw.tries++;
   const guess = results.map((r, k) => okEach[k] ? chars[k] : (r[0] || '？')).join('');
   if (hw.tries < 2) {
-    writeMsg(`🤔 看起來像「${esc(guess)}」，筆畫寫清楚一點，再寫一次看看！（還有 1 次機會）`);
+    writeMsg(hw.q.en ? `🤔 看起來像「${esc(guess)}」，再寫一次看看！提示：<b>${esc(hintOf(hw.q.w))}</b>` : `🤔 看起來像「${esc(guess)}」，筆畫寫清楚一點，再寫一次看看！（還有 1 次機會）`);
     okEach.forEach((ok, k) => { if (!ok) writeClear(k); });
     app.querySelector('.question')?.classList.add('shake');
     setTimeout(() => app.querySelector('.question')?.classList.remove('shake'), 500);
@@ -140,8 +155,8 @@ function writeSelfCheck() {
 }
 
 function writeCompareHtml() {
-  return `<div class="hw-cmp-col"><span class="small muted">我寫的</span><div class="row">${hw.boxes.map(b => `<img src="${b.cv.toDataURL()}" class="hw-img">`).join('')}</div></div>
-    <div class="hw-cmp-col"><span class="small muted">正確答案</span><div class="hw-ans">${esc(hw.q.w)}</div></div>`;
+  return `<div class="hw-cmp-col"><span class="small muted">我寫的</span><div class="row">${hw.boxes.map(b => `<img src="${b.cv.toDataURL()}" class="hw-img${hw.q.en ? ' hw-img-en' : ''}">`).join('')}</div></div>
+    <div class="hw-cmp-col"><span class="small muted">正確答案</span><div class="hw-ans"${hw.q.en ? ' style="font-family:inherit;font-size:44px"' : ''}>${esc(hw.q.w)}</div></div>`;
 }
 
 function writeFinish(ok) {
@@ -180,6 +195,9 @@ function setHwMode(m) { S.hwMode = m; save(); toast(m === 'auto' ? '手寫題改
   .hw-pad { touch-action: none; border-radius: 12px; border: 3px solid #e2a3a3; background-color: #fff;
     background-image: linear-gradient(#f3c9c9, #f3c9c9), linear-gradient(#f3c9c9, #f3c9c9);
     background-size: 100% 2px, 2px 100%; background-position: center; background-repeat: no-repeat; cursor: crosshair; }
+  .hw-en { border-color: #9cc3e6; background-image: linear-gradient(#e15c5c, #e15c5c), linear-gradient(#b8d4ee, #b8d4ee), linear-gradient(#b8d4ee, #b8d4ee), linear-gradient(#b8d4ee, #b8d4ee);
+    background-size: 100% 2px, 100% 1px, 100% 1px, 100% 1px; background-position: 0 70%, 0 20%, 0 45%, 0 92%; }
+  .hw-img-en { width: auto; height: 70px; }
   .hw-pad.right { border-color: var(--ok); } .hw-pad.wrong { border-color: var(--bad); }
   .hw-compare { display: flex; justify-content: center; gap: 24px; align-items: flex-end; flex-wrap: wrap; margin-top: 8px; }
   .hw-cmp-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
