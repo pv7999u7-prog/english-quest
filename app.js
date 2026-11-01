@@ -710,8 +710,8 @@ function noteHtml(c) {
         <span class="small muted">考試重要度 <span class="stars">${stars(c.star)}</span></span></div>
       <h2 style="margin:10px 0 6px">${esc(c.name)}</h2>
       <div class="goal">🎯 ${esc(c.goal)}</div>
-      ${c.blocks.map(([h, items]) => `
-        <div class="note-block"><h3>${esc(h)}</h3><ul>${items.map(t => `<li>${md(t)}</li>`).join('')}</ul></div>`).join('')}
+      ${c.blocks.map(([h, items], bi) => `
+        <div class="note-block"><h3>${esc(h)}</h3><ul>${items.map((t, ti) => `<li>${md(t)}${noteSayBtns(c, bi, ti)}</li>`).join('')}</ul></div>`).join('')}
       ${c.tip ? `<div class="note-box tip"><b>💡 記憶口訣</b><div>${md(c.tip)}</div></div>` : ''}
       ${c.trap ? `<div class="note-box trap"><b>⚠️ 易錯陷阱</b><div>${md(c.trap)}</div></div>` : ''}
       ${c.often ? `<div class="note-box exam"><b>📝 常考題型</b><div>${md(c.often)}</div></div>` : ''}
@@ -726,20 +726,13 @@ function openNote(key) {
   app.innerHTML = `
     <div class="top-bar"><button class="back" onclick="go(notesMenu)">← 筆記</button><button class="back" onclick="home()">首頁</button></div>
     <div class="card">${noteHtml(c)}</div>
-    <button id="readBtn" class="big-btn green" onclick="finishNote('${key}')" ${readToday ? 'disabled' : 'disabled'}>
-      ${readToday ? '✓ 今天已經讀過這篇' : `再讀 ${NOTE_SECONDS} 秒…`}</button>
+    <button id="readBtn" class="big-btn green" onclick="finishNote('${key}')" disabled>
+      ${readToday ? '✓ 今天已經讀過這篇' : noteLeftText(key)}</button>
     <div style="height:10px"></div>
     <button class="big-btn ghost" onclick="startPractice('${key}')">🎯 練習這一章（10 題）</button>`;
   scrollTo(0, 0);
-  if (readToday) return;
-  let left = NOTE_SECONDS;
-  noteTimer = setInterval(() => {
-    const b = document.getElementById('readBtn');
-    if (!b) { stopNoteTimer(); return; }
-    left--;
-    if (left > 0) b.textContent = `再讀 ${left} 秒…`;
-    else { stopNoteTimer(); b.disabled = false; b.textContent = `✓ 我讀完了（+${NOTE_XP} 經驗）`; }
-  }, 1000);
+  noteOpenKey = readToday ? null : key;
+  if (!readToday) noteRefresh();
 }
 function finishNote(key) {
   if (S.notesRead[key] === today()) return;
@@ -749,6 +742,7 @@ function finishNote(key) {
   save();
   payTasks();
   burst('📖', 10);
+  noteOpenKey = null;
   const b = document.getElementById('readBtn');
   if (b) { b.disabled = true; b.textContent = '✓ 讀完了！'; }
   setTimeout(home, 1200);
@@ -1245,23 +1239,25 @@ if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pic
 const ttsAudio = new Audio();
 ttsAudio.preload = 'auto';
 const ttsUrl = t => 'https://translate.google.com/translate_tts?ie=UTF-8&tl=en-US&client=tw-ob&q=' + encodeURIComponent(t.slice(0, 190));
-function speakSynth(text, slow) {
+function speakSynth(text, slow, onDone) {
   if (!window.speechSynthesis) { toast('這台裝置播放不了發音，請檢查網路或音量'); return; }
   if (speechSynthesis.speaking) speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US';
   if (enVoice) u.voice = enVoice;
   u.rate = slow ? 0.6 : 0.85;
+  if (onDone) u.onend = onDone;
   speechSynthesis.speak(u);
 }
-function speak(text, slow) {
-  ttsAudio.onerror = () => speakSynth(text, slow);
+function speak(text, slow, onDone) {
+  ttsAudio.onended = onDone || null; // 有完整播完才回呼（中途換別的音就不算）
+  ttsAudio.onerror = () => speakSynth(text, slow, onDone);
   ttsAudio.src = ttsUrl(text);
   ttsAudio.defaultPlaybackRate = ttsAudio.playbackRate = slow ? 0.65 : 1;
   ttsAudio.onloadedmetadata = () => { ttsAudio.playbackRate = slow ? 0.65 : 1; };
   const p = ttsAudio.play();
   // 沒按按鈕就自動播放被擋（NotAllowedError）時不吵孩子，按 🔊 就能聽
-  if (p) p.catch(err => { if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') speakSynth(text, slow); });
+  if (p) p.catch(err => { if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') speakSynth(text, slow, onDone); });
 }
 const sayBtn = (text, label, slow) => `<button class="say-btn" onclick='speak(${JSON.stringify(text).replace(/'/g, '&#39;')}, ${slow ? 1 : 0})'>${label}</button>`;
 // 答完題：可以點來聽單字、例句、正確句子
@@ -1363,4 +1359,50 @@ function checkType() {
   inp.classList.add(ok ? 'right' : 'wrong');
   document.getElementById('typemsg').innerHTML = '';
   afterAnswer(q, ok, ok ? '' : `正確答案：${q.w}（你打的是 ${inp.value.trim()}）`);
+}
+
+// ───────── 英文版：重點筆記每個字、每句都要點來聽完 ─────────
+// 單字關：每個單字、每個例句都算；文法：3 個字以上的英文句子／片語才算（避免 I、you 這種單字太多）
+function noteSayTexts(c, bi, ti) {
+  const t = c.blocks[bi][1][ti].replace(/\*\*/g, '');
+  if (c.s === 'voc' && bi === 0) return [t.split('　')[0].trim()];
+  const parts = (t.match(/[A-Za-z][A-Za-z0-9 ,'’\-]*[A-Za-z0-9][.?!]?/g) || []).map(x => x.trim());
+  return parts.filter(x => c.s === 'voc' || x.split(' ').length >= 3);
+}
+// 這一章所有要聽的內容（依序編號）
+function noteSayList(c) {
+  const list = [];
+  c.blocks.forEach(([, items], bi) => items.forEach((_, ti) => noteSayTexts(c, bi, ti).forEach(text => list.push({ bi, ti, text }))));
+  return list;
+}
+let noteOpenKey = null;
+const noteHeard = key => ((ensureDay().heard ||= {})[key] ||= []);
+function noteSayBtns(c, bi, ti) {
+  const list = noteSayList(c);
+  return list.map((x, i) => [x, i]).filter(([x]) => x.bi === bi && x.ti === ti)
+    .map(([x, i]) => `<button class="say-btn note-say ${noteHeard(c.key).includes(i) ? 'heard' : ''}" data-k="${c.key}" data-i="${i}" onclick="noteSay('${c.key}', ${i})">🔊${list.filter(y => y.bi === bi && y.ti === ti).length > 1 ? ' ' + esc(x.text.split(' ').slice(0, 3).join(' ')) + (x.text.split(' ').length > 3 ? '…' : '') : ''}</button>`).join('');
+}
+function noteSay(key, i) {
+  const x = noteSayList(CH[key])[i];
+  if (!x) return;
+  document.querySelectorAll('.note-say.playing').forEach(b => b.classList.remove('playing'));
+  const btn = document.querySelector(`.note-say[data-k="${key}"][data-i="${i}"]`);
+  btn?.classList.add('playing');
+  speak(x.text, false, () => {
+    btn?.classList.remove('playing');
+    const h = noteHeard(key);
+    if (!h.includes(i)) { h.push(i); save(); }
+    btn?.classList.add('heard');
+    if (noteOpenKey === key) noteRefresh();
+  });
+}
+function noteLeftText(key) {
+  const n = noteSayList(CH[key]).length, h = noteHeard(key).length;
+  return h >= n ? `✓ 我讀完了（+${NOTE_XP} 經驗）` : `🔊 每個字、每一句都要點來聽完（已聽 ${h} / ${n}）`;
+}
+function noteRefresh() {
+  const b = document.getElementById('readBtn');
+  if (!b || !noteOpenKey) return;
+  b.textContent = noteLeftText(noteOpenKey);
+  b.disabled = noteHeard(noteOpenKey).length < noteSayList(CH[noteOpenKey]).length;
 }

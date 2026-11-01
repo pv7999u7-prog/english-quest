@@ -238,6 +238,10 @@ input[type=text], input[type=tel] { font: inherit; padding: 10px 12px; border-ra
 .type-in.right { border-color: var(--ok); background: var(--ok-soft); } .type-in.wrong { border-color: var(--bad); }
 .type-box .big-btn { width: auto; padding: 12px 22px; }
 .hint-letters { font-size: 22px; letter-spacing: 2px; color: var(--brand-dark); }
+.note-say { padding: 4px 10px; font-size: 15px; margin: 2px 0 2px 6px; vertical-align: middle; box-shadow: 0 2px 0 #154e7e; background: #3d8ad6; }
+.note-say.heard { background: var(--ok); box-shadow: 0 2px 0 #1f6b2f; }
+.note-say.heard::after { content: ' ✓'; }
+.note-say.playing { background: #f2a516; box-shadow: 0 2px 0 #b07400; }
 .wf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .wf-card { margin: 0; }
 .wf-word { font-size: 30px; font-weight: 800; color: var(--brand-dark); cursor: pointer; letter-spacing: .5px; }
