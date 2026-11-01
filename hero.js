@@ -85,99 +85,101 @@ const MAT = {
 };
 
 // ───────── 商店 ─────────
+// 價格：全部買齊約 2,900 金幣。模擬認真照進度的孩子（每週 6 天、每天最多賺 100）：到 1/10 約賺 5,800，照顧約 1,700，全部買齊後每週還剩約 120 閒錢，可以 1～2 週換一個小獎勵
 const PET_SHOP = {
   color: { name: '造型', icon: '🎨', items: [
     { id: 's-steve', name: '經典勇者', cost: 0 },
-    { id: 's-alex', name: '紅髮冒險家', cost: 20 },
-    { id: 's-zombie', name: '殭屍', cost: 40 },
-    { id: 's-villager', name: '村民', cost: 60 },
-    { id: 's-creeper', name: '苦力怕', cost: 100 },
-    { id: 's-ender', name: '終界使者', cost: 200 },
-    { id: 's-rainbow', name: '彩虹變色', cost: 500, cls: 'pet-rainbow' },
-    { id: 's-gold', name: '閃亮黃金', cost: 1000 },
+    { id: 's-alex', name: '紅髮冒險家', cost: 5 },
+    { id: 's-zombie', name: '殭屍', cost: 5 },
+    { id: 's-villager', name: '村民', cost: 10 },
+    { id: 's-creeper', name: '苦力怕', cost: 10 },
+    { id: 's-ender', name: '終界使者', cost: 30 },
+    { id: 's-rainbow', name: '彩虹變色', cost: 70, cls: 'pet-rainbow' },
+    { id: 's-gold', name: '閃亮黃金', cost: 140 },
   ] },
   hat: { name: '頭盔', icon: '⛑️', items: [
-    { id: 'h-leather', name: '皮革頭盔', cost: 10, mat: 'leather' },
-    { id: 'h-chain', name: '鎖鏈頭盔', cost: 30, mat: 'chain' },
-    { id: 'h-iron', name: '鐵頭盔', cost: 60, mat: 'iron' },
-    { id: 'h-pumpkin', name: '南瓜頭', cost: 80, pumpkin: 1 },
-    { id: 'h-gold', name: '金頭盔', cost: 120, mat: 'gold' },
-    { id: 'h-turtle', name: '海龜殼頭盔', cost: 200, mat: 'turtle' },
-    { id: 'h-diamond', name: '鑽石頭盔', cost: 300, mat: 'diamond' },
-    { id: 'h-netherite', name: '獄髓頭盔', cost: 600, mat: 'netherite' },
+    { id: 'h-leather', name: '皮革頭盔', cost: 5, mat: 'leather' },
+    { id: 'h-chain', name: '鎖鏈頭盔', cost: 5, mat: 'chain' },
+    { id: 'h-iron', name: '鐵頭盔', cost: 10, mat: 'iron' },
+    { id: 'h-pumpkin', name: '南瓜頭', cost: 10, pumpkin: 1 },
+    { id: 'h-gold', name: '金頭盔', cost: 15, mat: 'gold' },
+    { id: 'h-turtle', name: '海龜殼頭盔', cost: 30, mat: 'turtle' },
+    { id: 'h-diamond', name: '鑽石頭盔', cost: 40, mat: 'diamond' },
+    { id: 'h-netherite', name: '獄髓頭盔', cost: 80, mat: 'netherite' },
   ] },
   outfit: { name: '盔甲', icon: '🛡️', items: [
-    { id: 'o-leather', name: '皮革盔甲', cost: 20, mat: 'leather' },
-    { id: 'o-chain', name: '鎖鏈盔甲', cost: 50, mat: 'chain' },
-    { id: 'o-iron', name: '鐵盔甲', cost: 100, mat: 'iron' },
-    { id: 'o-gold', name: '金盔甲', cost: 180, mat: 'gold' },
-    { id: 'o-diamond', name: '鑽石盔甲', cost: 400, mat: 'diamond' },
-    { id: 'o-elytra', name: '鞘翅', cost: 500, elytra: 1 },
-    { id: 'o-netherite', name: '獄髓盔甲', cost: 800, mat: 'netherite' },
+    { id: 'o-leather', name: '皮革盔甲', cost: 5, mat: 'leather' },
+    { id: 'o-chain', name: '鎖鏈盔甲', cost: 10, mat: 'chain' },
+    { id: 'o-iron', name: '鐵盔甲', cost: 10, mat: 'iron' },
+    { id: 'o-gold', name: '金盔甲', cost: 25, mat: 'gold' },
+    { id: 'o-diamond', name: '鑽石盔甲', cost: 55, mat: 'diamond' },
+    { id: 'o-elytra', name: '鞘翅', cost: 70, elytra: 1 },
+    { id: 'o-netherite', name: '獄髓盔甲', cost: 110, mat: 'netherite' },
   ] },
   gear: { name: '武器工具', icon: '⚔️', items: [
-    { id: 'g-wsword', name: '木劍', cost: 10, kind: 'sword', tier: 'wood' },
-    { id: 'g-wpick', name: '木鎬', cost: 15, kind: 'pick', tier: 'wood' },
-    { id: 'g-spick', name: '石鎬', cost: 40, kind: 'pick', tier: 'stone' },
-    { id: 'g-ipick', name: '鐵鎬', cost: 90, kind: 'pick', tier: 'iron' },
-    { id: 'g-naxe', name: '獄髓斧', cost: 800, kind: 'axe', tier: 'netherite' },
-    { id: 'g-waxe', name: '木斧', cost: 20, kind: 'axe', tier: 'wood' },
-    { id: 'g-ssword', name: '石劍', cost: 30, kind: 'sword', tier: 'stone' },
-    { id: 'g-shield', name: '盾牌', cost: 60, kind: 'shield' },
-    { id: 'g-isword', name: '鐵劍', cost: 80, kind: 'sword', tier: 'iron' },
-    { id: 'g-iaxe', name: '鐵斧', cost: 100, kind: 'axe', tier: 'iron' },
-    { id: 'g-bow', name: '弓', cost: 120, kind: 'bow' },
-    { id: 'g-gsword', name: '金劍', cost: 150, kind: 'sword', tier: 'gold' },
-    { id: 'g-dpick', name: '鑽石鎬', cost: 250, kind: 'pick', tier: 'diamond' },
-    { id: 'g-dsword', name: '鑽石劍', cost: 300, kind: 'sword', tier: 'diamond' },
-    { id: 'g-daxe', name: '鑽石斧', cost: 350, kind: 'axe', tier: 'diamond' },
-    { id: 'g-trident', name: '三叉戟', cost: 500, kind: 'trident' },
-    { id: 'g-nsword', name: '獄髓劍', cost: 700, kind: 'sword', tier: 'netherite' },
-    { id: 'g-esword', name: '附魔鑽石劍', cost: 1000, kind: 'sword', tier: 'diamond', glint: 1 },
+    { id: 'g-wsword', name: '木劍', cost: 5, kind: 'sword', tier: 'wood' },
+    { id: 'g-wpick', name: '木鎬', cost: 5, kind: 'pick', tier: 'wood' },
+    { id: 'g-spick', name: '石鎬', cost: 5, kind: 'pick', tier: 'stone' },
+    { id: 'g-ipick', name: '鐵鎬', cost: 10, kind: 'pick', tier: 'iron' },
+    { id: 'g-naxe', name: '獄髓斧', cost: 110, kind: 'axe', tier: 'netherite' },
+    { id: 'g-waxe', name: '木斧', cost: 5, kind: 'axe', tier: 'wood' },
+    { id: 'g-ssword', name: '石劍', cost: 5, kind: 'sword', tier: 'stone' },
+    { id: 'g-shield', name: '盾牌', cost: 10, kind: 'shield' },
+    { id: 'g-isword', name: '鐵劍', cost: 10, kind: 'sword', tier: 'iron' },
+    { id: 'g-iaxe', name: '鐵斧', cost: 10, kind: 'axe', tier: 'iron' },
+    { id: 'g-bow', name: '弓', cost: 15, kind: 'bow' },
+    { id: 'g-gsword', name: '金劍', cost: 20, kind: 'sword', tier: 'gold' },
+    { id: 'g-dpick', name: '鑽石鎬', cost: 35, kind: 'pick', tier: 'diamond' },
+    { id: 'g-dsword', name: '鑽石劍', cost: 40, kind: 'sword', tier: 'diamond' },
+    { id: 'g-daxe', name: '鑽石斧', cost: 50, kind: 'axe', tier: 'diamond' },
+    { id: 'g-trident', name: '三叉戟', cost: 70, kind: 'trident' },
+    { id: 'g-nsword', name: '獄髓劍', cost: 100, kind: 'sword', tier: 'netherite' },
+    { id: 'g-esword', name: '附魔鑽石劍', cost: 140, kind: 'sword', tier: 'diamond', glint: 1 },
   ] },
   mount: { name: '坐騎', icon: '🐎', items: [
-    { id: 'm-pig', name: '騎豬', cost: 80 },
-    { id: 'm-boat', name: '木船', cost: 150 },
-    { id: 'm-horse', name: '馬', cost: 200 },
-    { id: 'm-cart', name: '礦車列車', cost: 250 },
-    { id: 'm-llama', name: '羊駝', cost: 300 },
-    { id: 'm-camel', name: '駱駝', cost: 350 },
-    { id: 'm-strider', name: '赤足獸', cost: 500 },
-    { id: 'm-dragon', name: '終界龍', cost: 1000 },
+    { id: 'm-pig', name: '騎豬', cost: 10 },
+    { id: 'm-boat', name: '木船', cost: 20 },
+    { id: 'm-horse', name: '馬', cost: 30 },
+    { id: 'm-cart', name: '礦車列車', cost: 35 },
+    { id: 'm-llama', name: '羊駝', cost: 40 },
+    { id: 'm-camel', name: '駱駝', cost: 50 },
+    { id: 'm-strider', name: '赤足獸', cost: 70 },
+    { id: 'm-dragon', name: '終界龍', cost: 140 },
   ] },
   buddy: { name: '寵物', icon: '🐔', items: [
-    { id: 'p-chicken', name: '小雞', cost: 30 },
-    { id: 'p-pig', name: '小豬', cost: 40 },
-    { id: 'p-sheep', name: '綿羊', cost: 50 },
-    { id: 'p-cat', name: '貓咪', cost: 80 },
-    { id: 'p-wolf', name: '狼狗', cost: 100 },
-    { id: 'p-fox', name: '狐狸', cost: 150 },
-    { id: 'p-bee', name: '蜜蜂', cost: 150 },
-    { id: 'p-parrot', name: '鸚鵡', cost: 200 },
-    { id: 'p-slime', name: '史萊姆', cost: 200 },
-    { id: 'p-axolotl', name: '六角恐龍', cost: 250 },
-    { id: 'p-panda', name: '熊貓', cost: 300 },
-    { id: 'p-creeper', name: '苦力怕', cost: 400 },
-    { id: 'p-skeleton', name: '骷髏弓箭手', cost: 500 },
-    { id: 'p-golem', name: '鐵傀儡', cost: 800 },
+    { id: 'p-chicken', name: '小雞', cost: 5 },
+    { id: 'p-pig', name: '小豬', cost: 5 },
+    { id: 'p-sheep', name: '綿羊', cost: 10 },
+    { id: 'p-cat', name: '貓咪', cost: 10 },
+    { id: 'p-wolf', name: '狼狗', cost: 10 },
+    { id: 'p-fox', name: '狐狸', cost: 20 },
+    { id: 'p-bee', name: '蜜蜂', cost: 20 },
+    { id: 'p-parrot', name: '鸚鵡', cost: 30 },
+    { id: 'p-slime', name: '史萊姆', cost: 30 },
+    { id: 'p-axolotl', name: '六角恐龍', cost: 35 },
+    { id: 'p-panda', name: '熊貓', cost: 40 },
+    { id: 'p-creeper', name: '苦力怕', cost: 55 },
+    { id: 'p-skeleton', name: '骷髏弓箭手', cost: 70 },
+    { id: 'p-golem', name: '鐵傀儡', cost: 110 },
+    { id: 'p-dragon', name: '終界龍', cost: 140 },
   ] },
   bg: { name: '世界', icon: '🌍', items: [
     { id: 'b-plains', name: '平原', cost: 0 },
-    { id: 'b-forest', name: '森林', cost: 50 },
-    { id: 'b-desert', name: '沙漠', cost: 80 },
-    { id: 'b-snow', name: '雪原', cost: 100 },
-    { id: 'b-ocean', name: '海洋', cost: 120 },
-    { id: 'b-cherry', name: '櫻花林', cost: 150 },
-    { id: 'b-cave', name: '礦坑', cost: 200 },
-    { id: 'b-village', name: '村莊', cost: 250 },
-    { id: 'b-mushroom', name: '蘑菇島', cost: 300 },
-    { id: 'b-nether', name: '下界', cost: 500 },
-    { id: 'b-end', name: '終界', cost: 800 },
-    { id: 'b-gold', name: '黃金神殿', cost: 1000 },
+    { id: 'b-forest', name: '森林', cost: 10 },
+    { id: 'b-desert', name: '沙漠', cost: 10 },
+    { id: 'b-snow', name: '雪原', cost: 10 },
+    { id: 'b-ocean', name: '海洋', cost: 15 },
+    { id: 'b-cherry', name: '櫻花林', cost: 20 },
+    { id: 'b-cave', name: '礦坑', cost: 30 },
+    { id: 'b-village', name: '村莊', cost: 35 },
+    { id: 'b-mushroom', name: '蘑菇島', cost: 40 },
+    { id: 'b-nether', name: '下界', cost: 70 },
+    { id: 'b-end', name: '終界', cost: 110 },
+    { id: 'b-gold', name: '黃金神殿', cost: 140 },
   ] },
 };
 // 每樣東西要升到哪個階段才買得到（照 Minecraft 開荒順序：木 → 石 → 鐵、金 → 鑽石 → 下界獄髓 → 終界）
-const ITEM_NEED = { 's-steve': 0, 's-alex': 0, 's-villager': 1, 's-zombie': 1, 's-creeper': 2, 's-rainbow': 3, 's-gold': 4, 's-ender': 5, 'h-leather': 0, 'h-pumpkin': 1, 'h-chain': 1, 'h-iron': 2, 'h-gold': 2, 'h-turtle': 3, 'h-diamond': 3, 'h-netherite': 4, 'o-leather': 0, 'o-chain': 1, 'o-iron': 2, 'o-gold': 2, 'o-diamond': 3, 'o-netherite': 4, 'o-elytra': 5, 'g-wsword': 0, 'g-wpick': 0, 'g-spick': 1, 'g-ipick': 2, 'g-naxe': 4, 'g-waxe': 0, 'g-ssword': 1, 'g-bow': 1, 'g-shield': 2, 'g-isword': 2, 'g-iaxe': 2, 'g-gsword': 2, 'g-dpick': 3, 'g-dsword': 3, 'g-daxe': 3, 'g-trident': 3, 'g-esword': 3, 'g-nsword': 4, 'm-boat': 0, 'm-pig': 1, 'm-horse': 1, 'm-cart': 2, 'm-llama': 2, 'm-camel': 2, 'm-strider': 4, 'm-dragon': 5, 'p-chicken': 0, 'p-pig': 0, 'p-sheep': 0, 'p-cat': 1, 'p-wolf': 1, 'p-fox': 2, 'p-bee': 2, 'p-parrot': 2, 'p-axolotl': 2, 'p-golem': 3, 'p-slime': 3, 'p-panda': 3, 'p-creeper': 3, 'p-skeleton': 4, 'b-plains': 0, 'b-forest': 0, 'b-desert': 1, 'b-snow': 1, 'b-ocean': 1, 'b-cave': 2, 'b-cherry': 2, 'b-village': 2, 'b-mushroom': 3, 'b-nether': 4, 'b-end': 5, 'b-gold': 5 };
+const ITEM_NEED = { 's-steve': 0, 's-alex': 0, 's-villager': 1, 's-zombie': 1, 's-creeper': 2, 's-rainbow': 3, 's-gold': 4, 's-ender': 5, 'h-leather': 0, 'h-pumpkin': 1, 'h-chain': 1, 'h-iron': 2, 'h-gold': 2, 'h-turtle': 3, 'h-diamond': 3, 'h-netherite': 4, 'o-leather': 0, 'o-chain': 1, 'o-iron': 2, 'o-gold': 2, 'o-diamond': 3, 'o-netherite': 4, 'o-elytra': 5, 'g-wsword': 0, 'g-wpick': 0, 'g-spick': 1, 'g-ipick': 2, 'g-naxe': 4, 'g-waxe': 0, 'g-ssword': 1, 'g-bow': 1, 'g-shield': 2, 'g-isword': 2, 'g-iaxe': 2, 'g-gsword': 2, 'g-dpick': 3, 'g-dsword': 3, 'g-daxe': 3, 'g-trident': 3, 'g-esword': 3, 'g-nsword': 4, 'm-boat': 0, 'm-pig': 1, 'm-horse': 1, 'm-cart': 2, 'm-llama': 2, 'm-camel': 2, 'm-strider': 4, 'm-dragon': 5, 'p-chicken': 0, 'p-pig': 0, 'p-sheep': 0, 'p-cat': 1, 'p-wolf': 1, 'p-fox': 2, 'p-bee': 2, 'p-parrot': 2, 'p-axolotl': 2, 'p-golem': 3, 'p-slime': 3, 'p-panda': 3, 'p-creeper': 3, 'p-skeleton': 4, 'p-dragon': 5, 'b-plains': 0, 'b-forest': 0, 'b-desert': 1, 'b-snow': 1, 'b-ocean': 1, 'b-cave': 2, 'b-cherry': 2, 'b-village': 2, 'b-mushroom': 3, 'b-nether': 4, 'b-end': 5, 'b-gold': 5 };
 for (const c of Object.values(PET_SHOP)) { c.items.forEach(it => { it.need = ITEM_NEED[it.id] || 0; }); c.items.sort((x, y) => x.need - y.need || x.cost - y.cost); }
 const PET_SLOTS = ['color', 'hat', 'outfit', 'gear', 'mount', 'buddy', 'bg'];
 const PET_ITEM = Object.fromEntries(Object.values(PET_SHOP).flatMap(c => c.items).map(i => [i.id, i]));
@@ -335,22 +337,22 @@ function petSvg(stage, colorId, outfitId, gearId, hatId) {
 
 // ───────── 坐騎 ─────────
 const MOUNTS = {
-  'm-pig': { w: 0.62, rows: ['....SSSSSS..........', '.PPPPPPPPPPPPPPPP...', 'PPEPPPPPPPPPPPPPPP..', 'PNNPPPPPPPPPPPPPPPP.', 'PNNPPPPPPPPPPPPPPPP.', '.PPPPPPPPPPPPPPPPPP.', '..PPPPPPPPPPPPPPPP..', '..PP..PP....PP..PP..', '..pp..pp....pp..pp..'],
+  'm-pig': { seat: 0.9, sink: 0, w: 0.62, rows: ['....SSSSSS..........', '.PPPPPPPPPPPPPPPP...', 'PPEPPPPPPPPPPPPPPP..', 'PNNPPPPPPPPPPPPPPPP.', 'PNNPPPPPPPPPPPPPPPP.', '.PPPPPPPPPPPPPPPPPP.', '..PPPPPPPPPPPPPPPP..', '..PP..PP....PP..PP..', '..pp..pp....pp..pp..'],
     pal: { P: '#f0a5a2', p: '#c97a76', N: '#e07a75', E: '#222', S: '#6b4226' } },
-  'm-horse': { w: 0.72, rows: ['..MM..................', '.HHHM.................', 'HHEHHM................', 'HHHHHMM...............', '.NHHHHMHHHHHHHHHHH....', '..HHHHSSSSHHHHHHHHHT..', '...HHHHHHHHHHHHHHHHTT.', '....HHHHHHHHHHHHHHH.T.', '....HH.HH.....HH.HH...', '....HH.HH.....HH.HH...', '....hh.hh.....hh.hh...'],
+  'm-horse': { seat: 0.62, sink: 0, w: 0.72, rows: ['..MM..................', '.HHHM.................', 'HHEHHM................', 'HHHHHMM...............', '.NHHHHMHHHHHHHHHHH....', '..HHHHSSSSHHHHHHHHHT..', '...HHHHHHHHHHHHHHHHTT.', '....HHHHHHHHHHHHHHH.T.', '....HH.HH.....HH.HH...', '....HH.HH.....HH.HH...', '....hh.hh.....hh.hh...'],
     pal: { H: '#8b5a2b', M: '#3b2614', h: '#2b1a0e', N: '#6b4422', E: '#111', T: '#3b2614', S: '#5a3a22' } },
-  'm-boat': { w: 0.86, rows: ['W......................W', 'WW....................WW', 'wWWWWWWWWWWWWWWWWWWWWWWw', '.wwwwwwwwwwwwwwwwwwwwww.', '..wwwwwwwwwwwwwwwwwwww..', 'BBBBBBBBBBBBBBBBBBBBBBBB', 'bBBbBBBbBBBbBBBbBBBbBBBb'],
+  'm-boat': { seat: 0.75, sink: 0.08, w: 0.86, rows: ['W......................W', 'WW....................WW', 'wWWWWWWWWWWWWWWWWWWWWWWw', '.wwwwwwwwwwwwwwwwwwwwww.', '..wwwwwwwwwwwwwwwwwwww..', 'BBBBBBBBBBBBBBBBBBBBBBBB', 'bBBbBBBbBBBbBBBbBBBbBBBb'],
     pal: { W: '#c69a5a', w: '#8b6236', B: '#3f76e4', b: '#2c56b0' } },
-  'm-cart': { w: 0.78, rows: ['OOOOOOOOOOOOOOOOOOOO', 'OggggggggggggggggggO', 'OgDDDDDDDDDDDDDDDDgO', 'OgDDDDDDDDDDDDDDDDgO', 'OggggggggggggggggggO', '.OOOOOOOOOOOOOOOOOO.', '...KK..........KK...', '...KK..........KK...', 'RRRRRRRRRRRRRRRRRRRR', '.T..T..T..T..T..T..T'],
+  'm-cart': { seat: 0.8, sink: 0, w: 0.78, rows: ['OOOOOOOOOOOOOOOOOOOO', 'OggggggggggggggggggO', 'OgDDDDDDDDDDDDDDDDgO', 'OgDDDDDDDDDDDDDDDDgO', 'OggggggggggggggggggO', '.OOOOOOOOOOOOOOOOOO.', '...KK..........KK...', '...KK..........KK...', 'RRRRRRRRRRRRRRRRRRRR', '.T..T..T..T..T..T..T'],
     pal: { O: '#3c4043', g: '#9ea4aa', D: '#5b6066', K: '#222', R: '#a8a8a8', T: '#6b4a26' } },
-  'm-llama': { w: 0.6, rows: ['..LL............', '..LLL...........', '.LLELL..........', '.LLLLL..........', '..LLLL..........', '..LLLL..........', '..LLLLLLLLLLLLL.', '..RRRRRRRRRRRRL.', '..RYRYRYRYRYRYL.', '..LLLLLLLLLLLLL.', '...LL.LL..LL.LL.', '...LL.LL..LL.LL.', '...ll.ll..ll.ll.'],
+  'm-llama': { seat: 0.62, sink: 0, w: 0.6, rows: ['..LL............', '..LLL...........', '.LLELL..........', '.LLLLL..........', '..LLLL..........', '..LLLL..........', '..LLLLLLLLLLLLL.', '..RRRRRRRRRRRRL.', '..RYRYRYRYRYRYL.', '..LLLLLLLLLLLLL.', '...LL.LL..LL.LL.', '...LL.LL..LL.LL.', '...ll.ll..ll.ll.'],
     pal: { L: '#f1e6c8', l: '#b9a77e', E: '#222', R: '#d23b3b', Y: '#f2c14e' } },
-  'm-camel': { w: 0.76, rows: ['..CC....................', '.CCCC...................', 'CCECC...................', '.CCCC.......CCC.........', '..CCC......CCCCC........', '..CCCCCCCCCCCCCCCC......', '..CCCCCCCCCCCCCCCCC.....', '...CCCCCCCCCCCCCCCC.....', '....CC..CC....CC..CC....', '....CC..CC....CC..CC....', '....CC..CC....CC..CC....', '....cc..cc....cc..cc....'],
+  'm-camel': { seat: 0.72, sink: 0, w: 0.76, rows: ['..CC....................', '.CCCC...................', 'CCECC...................', '.CCCC.......CCC.........', '..CCC......CCCCC........', '..CCCCCCCCCCCCCCCC......', '..CCCCCCCCCCCCCCCCC.....', '...CCCCCCCCCCCCCCCC.....', '....CC..CC....CC..CC....', '....CC..CC....CC..CC....', '....CC..CC....CC..CC....', '....cc..cc....cc..cc....'],
     pal: { C: '#d9b36c', c: '#8a6b3a', E: '#222' } },
-  'm-strider': { w: 0.5, rows: ['..H..H...H..H...', 'RRRRRRRRRRRRRRRR', 'RRRRRRRRRRRRRRRR', 'RREERRRRRRRREERR', 'RRRRRRRRRRRRRRRR', 'RRRMMMMMMMMMMRRR', 'RRRRRRRRRRRRRRRR', 'rrrrrrrrrrrrrrrr', '....LL....LL....', '....LL....LL....', '....LL....LL....', '....LL....LL....', '..OOllOOOOllOO..', 'OOOOOOOOOOOOOOOO'],
+  'm-strider': { seat: 0.9, sink: 0, w: 0.4, rows: ['..H..H...H..H...', 'RRRRRRRRRRRRRRRR', 'RRRRRRRRRRRRRRRR', 'RREERRRRRRRREERR', 'RRRRRRRRRRRRRRRR', 'RRRMMMMMMMMMMRRR', 'RRRRRRRRRRRRRRRR', 'rrrrrrrrrrrrrrrr', '....LL....LL....', '....LL....LL....', '....LL....LL....', '....LL....LL....', '..OOllOOOOllOO..', 'OOOOOOOOOOOOOOOO'],
     pal: { R: '#b8423a', r: '#8c2f29', E: '#1a1a1a', M: '#5a1a16', H: '#e0d6c8', L: '#7a2a24', l: '#5a1a16', O: '#ff8c1a' } },
-  'm-dragon': { w: 0.95, rows: ['.......................GGG......', '....................GGGGGGGG....', '.................GGGGGGGGGGGG...', 'KKKKK.........KKKKKKKKKKKKKKKK..', 'KPKKKKK.....KKKKKKKKKKKKKKKKKKKK', 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK', '.KKKKKKKKKKKKKKKKKKKKKKKKKKKK.KK', '....KK.....KK....KK.....KK....KK', '....KK.....KK....KK.....KK.....K'],
-    pal: { K: '#1d1b26', P: '#d16bff', G: '#4a4560' } },
+  'm-dragon': { seat: 0.5, sink: 0, w: 1.15, rows: ['GG....................................GG', 'GKGG................................GGKG', 'GKKKGG............................GGKKKG', '.GKKKKGG........................GGKKKKG.', '.GKKKKKKGG....................GGKKKKKKG.', '..GKKKKKKKGG................GGKKKKKKKG..', '..GKKKKKKKKKGG............GGKKKKKKKKKG..', '...GKKKKKKKKKKGG...SS...GGKKKKKKKKKKG...', '...GKKKKKKKKKKKKGGSKKSGGKKKKKKKKKKKKG...', '....GKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKG....', '.....KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK.....', '......KKKK.KKKKKKKKKKKKKKKKKK.KKKK......', '.......KK...KKKKKKKKKKKKKKKK...KK.......', '..............KKKKKKKKKKKK..............', '..KKKKK.......KK..KK..KK..KK....KKK.....', '.KPKKKKKK.....K...K....K...K...KK.KK....', '.KKKKKKKKKKKKKK..............KK....K....', '..KK.KKK.....................K....K.....', '.............................KKKKK......'],
+    pal: { K: '#17151f', G: '#9a9aa6', S: '#b9b9c4', P: '#d16bff' } },
 };
 function mountSvg(id) { const m = MOUNTS[id]; return m ? pxSvg(m.rows, m.pal, 'pet-svg') : ''; }
 
@@ -369,6 +371,7 @@ const BUDDIES = {
   'p-panda': { rows: ['K.....K...', 'WWWWWWW...', 'WKWWKWW...', 'WWWKWWWWWW', 'KKKKKKKWWW', 'KKKKKKKKKK', '.KK.KK.KK.'], pal: { W: '#f2f2f2', K: '#222' } },
   'p-creeper': { rows: ['GGGGGG', 'GKGGKG', 'GGKKGG', 'GKKKKG', 'GKGGKG', 'GGGGGG', '.gggg.', '.gggg.', '.gggg.', '.gggg.', 'GG..GG', 'GG..GG'], pal: { G: '#5bbf4a', g: '#4fa83f', K: '#1a1a1a' } },
   'p-skeleton': { rows: ['..WWWW..', '..KWWK..', '..WKKW..', '..WWWW..', '...WW...', 'W.WWWW.W', 'W..WW..W', 'W.WWWW.W', 'W..WW..W', '...WW...', '..W..W..', '..W..W..', '..W..W..'], pal: { W: '#e9e9e9', K: '#333' }, bow: true },
+  'p-dragon': { rows: ['GG....................................GG', 'GKGG................................GGKG', 'GKKKGG............................GGKKKG', '.GKKKKGG........................GGKKKKG.', '.GKKKKKKGG....................GGKKKKKKG.', '..GKKKKKKKGG................GGKKKKKKKG..', '..GKKKKKKKKKGG............GGKKKKKKKKKG..', '...GKKKKKKKKKKGG...SS...GGKKKKKKKKKKG...', '...GKKKKKKKKKKKKGGSKKSGGKKKKKKKKKKKKG...', '....GKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKG....', '.....KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK.....', '......KKKK.KKKKKKKKKKKKKKKKKK.KKKK......', '.......KK...KKKKKKKKKKKKKKKK...KK.......', '..............KKKKKKKKKKKK..............', '..KKKKK.......KK..KK..KK..KK....KKK.....', '.KPKKKKKK.....K...K....K...K...KK.KK....', '.KKKKKKKKKKKKKK..............KK....K....', '..KK.KKK.....................K....K.....', '.............................KKKKK......'], pal: { K: '#17151f', G: '#9a9aa6', S: '#b9b9c4', P: '#d16bff' }, fly: true },
   'p-golem': { rows: ['..IIII..', '..IKKI..', '..IIII..', '...NN...', 'IIIIIIII', 'IIIVIIII', 'II.IIIII', 'II.II.II', 'II.II.II', '..II.II.', '..II.II.', '..II.II.'], pal: { I: '#d8d2c8', K: '#7a3a1a', N: '#a89c8c', V: '#5a8f3a' } },
 };
 function buddySvg(id) {
@@ -443,19 +446,23 @@ function petSceneHtml(px, mini = false) {
   const buddy = !mini && p.equip.buddy && BUDDIES[p.equip.buddy];
   const petPx = px * PET_STAGES[si].size * (mount ? 0.78 : 1) * (buddy ? 0.92 : 1);
   const ground = px * 0.26;
-  const lift = mount ? px * ({ 'm-boat': 0.1, 'm-cart': 0.14, 'm-dragon': 0.13 }[p.equip.mount] ?? 0.17) : 0;
+  // 騎乘：坐騎貼地（船稍微泡在水裡），英雄坐在坐騎背上
+  const mw = mount ? px * mount.w * 0.8 : 0;
+  const mBottom = mount ? ground - mw * (0.04 + mount.sink) : 0;
+  const mH = mount ? mount.rows.length / Math.max(pxW(mount.rows), mount.rows.length) * 0.92 : 0;
+  const lift = mount ? mBottom + mw * (0.04 + mH * mount.seat) - ground - px * 0.03 : 0;
   const heroLeft = (px - petPx) / 2 - (buddy ? px * 0.08 : 0);
   let h = `<div class="pet-scene" style="width:${px}px;height:${px}px;background:${w.bg}">`;
   h += `<svg class="pet-art" viewBox="0 0 100 100" preserveAspectRatio="none" shape-rendering="crispEdges">${w.art()}</svg>`;
   if (mount) {
-    const mw = px * mount.w * 0.8;
-    h += `<div class="pet-part" style="width:${mw}px;height:${mw}px;left:${heroLeft + petPx / 2 - mw / 2}px;bottom:${ground - mw * (p.equip.mount === 'm-dragon' ? 0.05 : 0.32)}px">${mountSvg(p.equip.mount)}</div>`;
+    h += `<div class="pet-part" style="width:${mw}px;height:${mw}px;left:${heroLeft + petPx / 2 - mw / 2}px;bottom:${mBottom}px">${mountSvg(p.equip.mount)}</div>`;
   }
   h += `<div class="pet-part pet-body${p.equip.color === 's-rainbow' ? ' pet-rainbow' : ''}${p.equip.color === 's-gold' ? ' pet-gold' : ''}" style="width:${petPx}px;height:${petPx}px;left:${heroLeft}px;bottom:${ground - px * 0.02 + lift}px">` +
     petSvg(si, p.equip.color, p.equip.outfit, mini ? null : p.equip.gear, p.equip.hat) + '</div>';
   if (buddy) {
-    const bw = px * (['p-golem', 'p-skeleton', 'p-creeper'].includes(p.equip.buddy) ? 0.3 : 0.22);
-    h += `<div class="pet-part pet-buddy" style="width:${bw}px;height:${bw}px;right:${px * 0.04}px;bottom:${ground - px * 0.02}px">${buddySvg(p.equip.buddy)}</div>`;
+    const fly = BUDDIES[p.equip.buddy].fly;
+    const bw = px * (fly ? 0.5 : ['p-golem', 'p-skeleton', 'p-creeper'].includes(p.equip.buddy) ? 0.3 : 0.22);
+    h += `<div class="pet-part pet-buddy${fly ? ' pet-fly' : ''}" style="width:${bw}px;height:${bw}px;right:${px * (fly ? 0.01 : 0.04)}px;${fly ? `top:${px * 0.02}px` : `bottom:${ground - px * 0.02}px`}">${buddySvg(p.equip.buddy)}</div>`;
   }
   return h + '</div>';
 }
@@ -706,6 +713,8 @@ function petShopTap(slot, id) {
   .pet-part { position: absolute; line-height: 1; }
   .pet-body { animation: petBob 2.4s ease-in-out infinite; }
   .pet-buddy { animation: petBob 1.8s ease-in-out infinite reverse; }
+  .pet-fly { animation: petFly 3.2s ease-in-out infinite; }
+  @keyframes petFly { 0%,100% { transform: translate(0, 0); } 50% { transform: translate(-6%, 8%); } }
   @keyframes petBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3%); } }
   .pet-rainbow { animation: petBob 2.4s ease-in-out infinite, petHue 3s linear infinite; }
   .pet-rainbow-g { animation: petHue 3s linear infinite; }
