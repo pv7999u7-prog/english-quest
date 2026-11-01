@@ -6,12 +6,13 @@
 
 // ───────── 成長階段 ─────────
 const PET_STAGES = [
-  { at: 0, name: '新手冒險家', emoji: '🙂', size: 0.50, desc: '剛來到方塊世界' },
-  { at: 260, name: '伐木小隊員', emoji: '🪓', size: 0.56, desc: '背起背包去砍樹' },
-  { at: 700, name: '礦坑探險家', emoji: '⛏️', size: 0.62, desc: '拿著火把挖礦' },
-  { at: 1300, name: '下界勇士', emoji: '🔥', size: 0.68, desc: '披上紅色披風' },
-  { at: 2100, name: '終界屠龍者', emoji: '🐉', size: 0.74, desc: '長出鞘翅翅膀' },
-  { at: 3000, name: '傳奇創世神', emoji: '👑', size: 0.80, desc: '金光閃閃的王者！' },
+  // 依 Minecraft 的開荒順序：木頭 → 石頭 → 鐵與金 → 鑽石 → 下界獄髓 → 終界
+  { at: 0, name: '木頭新手', emoji: '🪵', size: 0.50, desc: '徒手砍樹，做出木頭工具' },
+  { at: 260, name: '石器礦工', emoji: '🪨', size: 0.56, desc: '背起背包挖石頭' },
+  { at: 700, name: '鐵器勇者', emoji: '⛏️', size: 0.62, desc: '拿著火把挖到鐵和金' },
+  { at: 1300, name: '鑽石大師', emoji: '💎', size: 0.68, desc: '挖到鑽石，披上披風' },
+  { at: 2100, name: '下界勇士', emoji: '🔥', size: 0.74, desc: '穿越地獄門，取得獄髓' },
+  { at: 3000, name: '終界屠龍者', emoji: '🐉', size: 0.80, desc: '展開鞘翅，打敗終界龍！' },
 ];
 const PET_GOAL = { date: '2027-01-10', label: '總複習結束' }; // 養成目標日（顯示用）
 const PET_WEEK_CAP = 330;                 // 每週最多成長多少（避免一下子就養成）
@@ -116,6 +117,10 @@ const PET_SHOP = {
   ] },
   gear: { name: '武器工具', icon: '⚔️', items: [
     { id: 'g-wsword', name: '木劍', cost: 10, kind: 'sword', tier: 'wood' },
+    { id: 'g-wpick', name: '木鎬', cost: 15, kind: 'pick', tier: 'wood' },
+    { id: 'g-spick', name: '石鎬', cost: 40, kind: 'pick', tier: 'stone' },
+    { id: 'g-ipick', name: '鐵鎬', cost: 90, kind: 'pick', tier: 'iron' },
+    { id: 'g-naxe', name: '獄髓斧', cost: 800, kind: 'axe', tier: 'netherite' },
     { id: 'g-waxe', name: '木斧', cost: 20, kind: 'axe', tier: 'wood' },
     { id: 'g-ssword', name: '石劍', cost: 30, kind: 'sword', tier: 'stone' },
     { id: 'g-shield', name: '盾牌', cost: 60, kind: 'shield' },
@@ -171,6 +176,9 @@ const PET_SHOP = {
     { id: 'b-gold', name: '黃金神殿', cost: 1000 },
   ] },
 };
+// 每樣東西要升到哪個階段才買得到（照 Minecraft 開荒順序：木 → 石 → 鐵、金 → 鑽石 → 下界獄髓 → 終界）
+const ITEM_NEED = { 's-steve': 0, 's-alex': 0, 's-villager': 1, 's-zombie': 1, 's-creeper': 2, 's-rainbow': 3, 's-gold': 4, 's-ender': 5, 'h-leather': 0, 'h-pumpkin': 1, 'h-chain': 1, 'h-iron': 2, 'h-gold': 2, 'h-turtle': 3, 'h-diamond': 3, 'h-netherite': 4, 'o-leather': 0, 'o-chain': 1, 'o-iron': 2, 'o-gold': 2, 'o-diamond': 3, 'o-netherite': 4, 'o-elytra': 5, 'g-wsword': 0, 'g-wpick': 0, 'g-spick': 1, 'g-ipick': 2, 'g-naxe': 4, 'g-waxe': 0, 'g-ssword': 1, 'g-bow': 1, 'g-shield': 2, 'g-isword': 2, 'g-iaxe': 2, 'g-gsword': 2, 'g-dpick': 3, 'g-dsword': 3, 'g-daxe': 3, 'g-trident': 3, 'g-esword': 3, 'g-nsword': 4, 'm-boat': 0, 'm-pig': 1, 'm-horse': 1, 'm-cart': 2, 'm-llama': 2, 'm-camel': 2, 'm-strider': 4, 'm-dragon': 5, 'p-chicken': 0, 'p-pig': 0, 'p-sheep': 0, 'p-cat': 1, 'p-wolf': 1, 'p-fox': 2, 'p-bee': 2, 'p-parrot': 2, 'p-axolotl': 2, 'p-golem': 3, 'p-slime': 3, 'p-panda': 3, 'p-creeper': 3, 'p-skeleton': 4, 'b-plains': 0, 'b-forest': 0, 'b-desert': 1, 'b-snow': 1, 'b-ocean': 1, 'b-cave': 2, 'b-cherry': 2, 'b-village': 2, 'b-mushroom': 3, 'b-nether': 4, 'b-end': 5, 'b-gold': 5 };
+for (const c of Object.values(PET_SHOP)) { c.items.forEach(it => { it.need = ITEM_NEED[it.id] || 0; }); c.items.sort((x, y) => x.need - y.need || x.cost - y.cost); }
 const PET_SLOTS = ['color', 'hat', 'outfit', 'gear', 'mount', 'buddy', 'bg'];
 const PET_ITEM = Object.fromEntries(Object.values(PET_SHOP).flatMap(c => c.items).map(i => [i.id, i]));
 
@@ -296,7 +304,7 @@ function petSvg(stage, colorId, outfitId, gearId, hatId) {
   const s = 2.9, x0 = 50 - 8 * s, y0 = 96 - 32 * s;
   let back = '', front = '';
   // 階段配件
-  const cape = stage === 3, wings = stage >= 4 || (outfit && outfit.elytra);
+  const cape = stage === 3 || stage === 4, wings = stage >= 5 || (outfit && outfit.elytra);
   if (stage === 1 || stage === 2) back += pxArt(['BBBBBBBBBB', 'BbbbbbbbbB', 'BbbbbbbbbB', 'BBBBBBBBBB', 'BbbbbbbbbB', 'BbbbbbbbbB', 'BBBBBBBBBB'], { B: '#6b4a26', b: '#8b6236' }, x0 + 3 * s, y0 + 9 * s, s);
   if (cape) back += `<path d="M${x0 + 3 * s} ${y0 + 8 * s} L${x0 + 13 * s} ${y0 + 8 * s} L${x0 + 15 * s} ${y0 + 27 * s} L${x0 + 1 * s} ${y0 + 27 * s} Z" fill="#c1121f"/><path d="M${x0 + 1 * s} ${y0 + 27 * s} H${x0 + 15 * s}" stroke="#f2c14e" stroke-width="${s * 0.6}"/>`;
   if (wings) {
@@ -310,13 +318,13 @@ function petSvg(stage, colorId, outfitId, gearId, hatId) {
   // 南瓜頭
   if (hat && hat.pumpkin) body += pxArt(['OOOOOOOO', 'OoOOOOoO', 'OKKOOKKO', 'OKKOOKKO', 'OOOOOOOO', 'OKOKKOKO', 'OOKKKKOO', 'OOOOOOOO'], { O: '#e8871e', o: '#f4a53a', K: '#3a1f05' }, x0 + 4 * s, y0, s) +
     `<rect x="${x0 + 7 * s}" y="${y0 - 1.5 * s}" width="${2 * s}" height="${1.5 * s}" fill="#5a7a2a"/>`;
-  // 王冠（傳奇創世神）
+  // 王冠（終界屠龍者）
   if (stage === 5) front += pxArt(['Y.Y.Y.Y.Y.', 'YYYYYYYYYY', 'YRYYBYYRYY'], { Y: '#ffd43b', R: '#e63946', B: '#4dabf7' }, x0 + 3 * s, y0 - 3.4 * s, s);
-  // 火把（礦坑探險家以後）
+  // 火把（鐵器勇者以後）
   if (stage >= 2) front += `<circle cx="${x0 + 14 * s}" cy="${y0 + 13 * s}" r="${s * 3}" fill="#ffd36b" opacity=".35"/>` + itemArt({ kind: 'torch' }, x0 + 14 * s, y0 + 19 * s, s * 0.9, false);
   // 粒子
-  if (stage === 3) front += [[10, 90], [86, 84], [16, 70]].map(([x, y], i) => `<rect x="${x}" y="${y}" width="3" height="3" fill="${i % 2 ? '#ff8c1a' : '#ffd43b'}"><animate attributeName="y" values="${y};${y - 10};${y}" dur="${1.4 + i * .3}s" repeatCount="indefinite"/></rect>`).join('');
-  if (stage === 4) front += [[8, 40], [88, 30], [14, 74], [84, 66]].map(([x, y], i) => `<rect x="${x}" y="${y}" width="3" height="3" fill="#c77dff"><animate attributeName="opacity" values="1;.2;1" dur="${1.2 + i * .3}s" repeatCount="indefinite"/></rect>`).join('');
+  if (stage === 4) front += [[10, 90], [86, 84], [16, 70]].map(([x, y], i) => `<rect x="${x}" y="${y}" width="3" height="3" fill="${i % 2 ? '#ff8c1a' : '#ffd43b'}"><animate attributeName="y" values="${y};${y - 10};${y}" dur="${1.4 + i * .3}s" repeatCount="indefinite"/></rect>`).join('');
+  if (stage === 3) front += [[8, 40], [88, 30], [14, 74], [84, 66]].map(([x, y], i) => `<rect x="${x}" y="${y}" width="3" height="3" fill="#7ff3ee"><animate attributeName="opacity" values="1;.2;1" dur="${1.2 + i * .3}s" repeatCount="indefinite"/></rect>`).join('');
   if (stage === 5) front += [[6, 30], [90, 22], [10, 64], [88, 58]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="#9bf04a" stroke="#5fae1f" stroke-width=".6"><animate attributeName="cy" values="${y};${y - 6};${y}" dur="${1.6 + i * .2}s" repeatCount="indefinite"/></circle>`).join('');
   // 手上拿的
   if (gear) front += itemArt(gear, x0 + 2 * s, y0 + 19 * s, s * 0.95, true);
@@ -515,6 +523,7 @@ function petRoadmapHtml() {
         return `<div class="road-step ${state}">
           <span class="road-emoji">${petSvg(i, p.equip.color, null, null, null)}</span>
           <b>${st.name}</b><span class="small muted">${st.desc}</span>
+          <span class="small">🔓 ${Object.values(PET_SHOP).flatMap(c => c.items).filter(it => it.need === i).length} 樣新東西</span>
           <span class="road-tag">${state === 'done' ? '✓ 完成' : state === 'now' ? '現在' : `還差 ${st.at - p.grow}`}</span>
         </div>`;
       }).join('<span class="road-arrow">➜</span>')}</div>
@@ -582,8 +591,10 @@ function petShopHtml(slot, free) {
       : slot === 'buddy' ? buddySvg(it.id)
       : `<svg class="pet-svg" viewBox="0 0 100 100" preserveAspectRatio="none" shape-rendering="crispEdges">${WORLDS[it.id].art()}</svg>`;
     const box = slot === 'bg' ? `<span class="pi-ico pi-bg" style="background:${WORLDS[it.id].bg}">${preview}</span>` : `<span class="pi-ico pi-svg">${preview}</span>`;
-    const label = on ? (slot === 'color' || slot === 'bg' ? '使用中' : '使用中（點一下卸下）') : owned ? '點一下換上' : it.cost ? `🪙 ${it.cost}` : '免費';
-    return `<button class="pet-item ${on ? 'on' : ''}" onclick="petShopTap('${slot}','${it.id}')" ${!owned && free < it.cost ? 'disabled' : ''}>
+    const locked = !owned && it.need > petStage(p);
+    const label = on ? (slot === 'color' || slot === 'bg' ? '使用中' : '使用中（點一下卸下）') : owned ? '點一下換上'
+      : locked ? `🔒 升到「${PET_STAGES[it.need].name}」` : it.cost ? `🪙 ${it.cost}` : '免費';
+    return `<button class="pet-item ${on ? 'on' : ''} ${locked ? 'locked' : ''}" onclick="petShopTap('${slot}','${it.id}')" ${!owned && (locked || free < it.cost) ? 'disabled' : ''}>
       ${box}<b>${it.name}</b><span class="pi-cost ${owned ? 'owned' : ''}">${label}</span></button>`;
   }).join('')}</div>`;
 }
@@ -665,6 +676,7 @@ function petShopTap(slot, id) {
   const p = S.pet, it = PET_ITEM[id];
   if (!it) return;
   if (!p.owned.includes(id)) {
+    if (it.need > petStage(p)) { toast(`要先升到「${PET_STAGES[it.need].name}」才能拿到「${it.name}」喔！`); return; }
     if (!petSpend(it.cost, it.name)) return;
     p.owned.push(id);
     p.equip[slot] = id;
@@ -711,6 +723,8 @@ function petShopTap(slot, id) {
   .pet-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 12px 8px; border-radius: 12px; background: var(--bg); border: 3px solid transparent; text-align: center; }
   .pet-item.on { border-color: var(--ok); background: var(--ok-soft); }
   .pet-item:disabled { opacity: .45; }
+  .pet-item.locked .pi-svg, .pet-item.locked .pi-bg { filter: grayscale(1) brightness(.7); }
+  .pet-item.locked .pi-cost { color: var(--muted); font-size: 13px; }
   .pet-item b { font-size: 16px; }
   .pi-ico { font-size: 38px; line-height: 1.1; display: inline-block; }
   .pi-svg { width: 72px; height: 72px; }
